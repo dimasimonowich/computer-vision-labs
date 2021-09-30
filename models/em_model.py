@@ -77,8 +77,7 @@ class EM():
         self.p_classes = numerator / num_images
         # p_classes = (2, 1)
 
-    def fit(self, X):
-        # Initialization
+    def fit_predict(self, X):
         self.initialize_probs(X)
 
         for _ in range(self.num_epoch):
@@ -89,10 +88,7 @@ class EM():
             # Expectation
             self.perform_expectation_step(X)
 
-    def fit_predict(self, X):
-        self.fit(X)
-
-        self.perform_expectation_step(X)
+        # self.perform_expectation_step(X)
         prediction = self.p_classes_Xm.argmax(axis=0)
 
         return prediction
