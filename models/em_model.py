@@ -3,11 +3,18 @@ import numpy as np
 
 class EM():
     def __init__(self, eps=0.0001, num_epoch=10, num_classes=2):
+        assert eps > 0
+        assert type(num_epoch) == int
+        assert num_epoch > 0
+        assert type(num_classes) == int
+        assert num_classes > 1
+
         self.eps = eps
         self.num_epoch = num_epoch
         self.num_classes = num_classes
         self.p_ij_classes = None
         self.p_classes = None
+        self.p_classes_Xm = None
 
     def initialize_probs(self, X):
         self.p_classes_Xm = np.random.uniform(0, 1, (self.num_classes, X.shape[0]))
@@ -15,9 +22,14 @@ class EM():
     def perform_expectation_step(self, X):
         def get_p_target_class_Xm(p_ij_classes, p_classes, target_class, X):
             p_ij_classes = np.clip(p_ij_classes, self.eps, 1 - self.eps)
+            assert p_classes.shape[0] == self.num_classes
+            assert p_ij_classes.shape[0] == self.num_classes
+            assert p_ij_classes.shape[1] == X.shape[1]
+            assert type(target_class) == int
+
             # p_classes = (2, 1)
             # p_ij_classes = (2, 784)
-            # class_idx = int
+            # target_class = int
             # X = (14780, 784)
 
             all_classes = range(p_ij_classes.shape[0])
@@ -50,6 +62,7 @@ class EM():
 
         for target_class in range(self.p_classes_Xm.shape[0]):
             self.p_classes_Xm[target_class] = get_p_target_class_Xm(self.p_ij_classes, self.p_classes, target_class, X)
+
 
     def perform_maximization_step(self, X):
         # p_classes_Xm = (2, 14780)
