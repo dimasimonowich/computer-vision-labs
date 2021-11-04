@@ -22,3 +22,16 @@ def test_load_points_to_vec_true(vec, ans):
     for i in range(len(vec)):
         np.testing.assert_array_almost_equal(model.load_points_to_vec(vec)[i], ans[i], decimal= 2)
 
+
+@pytest.mark.parametrize("initial_beta, ans", [(np.array([1, 1, 1, 1, 1, 1, 1]),
+                                                np.array([[0., 0., 0., 0.5, -0.5, -0.5, 0.5],
+                                                       [0., 0., 0., 0.5, 0.5, 0.5, 0.5]])),
+                                               (np.array([1, 0, 0, 0, 0, 0, 0]),
+                                                np.array([[0., 0., 0., 1., 0., 0., 0.],
+                                                       [0., 0., 0., 0., 0., 0., 1.]]))])
+
+def test_load_points_to_vec_true(initial_beta, ans):
+    test_classifier = KozModel()
+    test_classifier.beta = initial_beta
+    test_ans = test_classifier.create_dummy_vecs()
+    np.testing.assert_array_almost_equal(test_ans, ans, decimal= 2)
