@@ -1,4 +1,4 @@
-from models.em_model import EM
+from lab_1.models.em_model import EM
 import pytest
 import numpy as np
 
