@@ -22,6 +22,19 @@ class KozModel:
 
         return X_vec
 
+    def create_dummy_vecs(self):
+        dummy_vecs = []
+        sigma = np.array([[self.beta[3]], [self.beta[4]],
+                          [self.beta[5]], [self.beta[6]]])
+
+        lamdas, v = np.linalg.eig(sigma)
+
+        for i in range(len(lamdas)):
+            if lamdas[i] >= 0:
+                dummy_vec = [0, 0, 0, v[i][0]*v[i][0], v[i][0]*v[i][1], v[i][1]*v[i][0], v[i][1]*v[i][1]]
+                dummy_vecs.append(dummy_vec)
+
+        return dummy_vecs
 
     def backward(self, vec, k):
         gamma = (np.dot(vec, vec) - k * np.dot(vec, self.beta)) / np.dot(self.beta - k*vec, self.beta - k*vec)
@@ -42,15 +55,33 @@ class KozModel:
                     self.backward(X_vec[m], y[m])
                     break
 
-            dummy_vec = self.create_dummy_vec()
-            dummy_logit = 1 * np.dot(dummy_vec, self.beta)
-
-            if dummy_logit <= 0:
-                self.backward(dummy_vec, 1)
+            # dummy_vecs = self.create_dummy_vecs()
+            #
+            # for dummy_vec in dummy_vecs:
+            #     dummy_logit = 1 * np.dot(dummy_vec, self.beta)
+            #
+            #     if dummy_logit <= 0:
+            #         self.backward(dummy_vec, 1)
 
             if np.sum(np.abs(running_beta - self.beta)) < self.eps:
                 break
 
+    def predict(self, X):
+        X_vec = self.load_points_to_vec(X)
+        prediction = []
 
-    def predict(self, y):
-        pass
+        for vec in X_vec:
+            logit = np.dot(vec, self.beta)
+
+            if logit > 0:
+                prediction.append(1)
+            elif logit <= 0:
+                prediction.append(-1)
+
+        return prediction
+
+    def fit_predict(self, X, y):
+        self.fit(X, y)
+        prediction = self.predict(X)
+
+        return prediction
