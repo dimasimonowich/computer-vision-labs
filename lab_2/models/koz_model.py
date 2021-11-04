@@ -13,14 +13,14 @@ class KozModel:
         self.beta = X_vec[0]
 
     def load_points_to_vec(self, X):
-        assert len(X) == 2
         X_vec = []
 
         for x in X:
+            assert len(x) == 2
             vec = [1, x[0], x[1], x[0]*x[0], x[0]*x[1], x[1]*x[0], x[1]*x[1]]
             X_vec.append(vec)
 
-        return X_vec
+        return np.array(X_vec)
 
     def create_dummy_vecs(self):
         dummy_vecs = []
@@ -37,7 +37,9 @@ class KozModel:
         return dummy_vecs
 
     def backward(self, vec, k):
-        gamma = (np.dot(vec, vec) - k * np.dot(vec, self.beta)) / np.dot(self.beta - k*vec, self.beta - k*vec)
+        numerator = np.dot(vec, vec) - k * np.dot(vec, self.beta)
+        denominator = np.dot(self.beta - k*vec, self.beta - k*vec)
+        gamma = numerator/denominator
         self.beta = gamma*self.beta + (1 - gamma)*k*vec
 
 
