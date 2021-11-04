@@ -3,7 +3,7 @@ import numpy as np
 X_sample = np.array([[1.5, 2.2], [3.1, 5.5]])
 
 class KozModel:
-    def __init__(self, max_num_epoch=100, eps=0.01):
+    def __init__(self, max_num_epoch=1000, eps=0.0001):
         self.max_num_epoch = max_num_epoch
         self.eps = eps
         self.beta = None
@@ -24,9 +24,8 @@ class KozModel:
 
     def create_dummy_vecs(self):
         dummy_vecs = []
-        sigma = np.array([[self.beta[3]], [self.beta[4]],
-                          [self.beta[5]], [self.beta[6]]])
-
+        sigma = np.array([[self.beta[3], self.beta[4]],
+                          [self.beta[5], self.beta[6]]])
         lamdas, v = np.linalg.eig(sigma)
 
         for i in range(len(lamdas)):
@@ -34,7 +33,7 @@ class KozModel:
                 dummy_vec = [0, 0, 0, v[i][0]*v[i][0], v[i][0]*v[i][1], v[i][1]*v[i][0], v[i][1]*v[i][1]]
                 dummy_vecs.append(dummy_vec)
 
-        return dummy_vecs
+        return np.array(dummy_vecs)
 
     def backward(self, vec, k):
         numerator = np.dot(vec, vec) - k * np.dot(vec, self.beta)
@@ -57,13 +56,13 @@ class KozModel:
                     self.backward(X_vec[m], y[m])
                     break
 
-            # dummy_vecs = self.create_dummy_vecs()
-            #
-            # for dummy_vec in dummy_vecs:
-            #     dummy_logit = 1 * np.dot(dummy_vec, self.beta)
-            #
-            #     if dummy_logit <= 0:
-            #         self.backward(dummy_vec, 1)
+            dummy_vecs = self.create_dummy_vecs()
+
+            for dummy_vec in dummy_vecs:
+                dummy_logit = 1 * np.dot(dummy_vec, self.beta)
+
+                if dummy_logit <= 0:
+                    self.backward(dummy_vec, 1)
 
             if np.sum(np.abs(running_beta - self.beta)) < self.eps:
                 break
