@@ -55,39 +55,41 @@ class Sudoku:
 
     def _get_arcs(self):
 
-        def get_row_arcs(field_labels, row_id):
-            row_labels = field_labels[row_id]
-            row_arcs = {}
+        def get_arcs_in_fields_list(fields_list):
+            arcs = []
 
-            for i, labels in enumerate(row_labels):
-                for j, label in enumerate(labels):
+            for i, from_field in enumerate(fields_list):
+                for j, to_field in enumerate(fields_list):
+                    if j > i:
+                        arc = {}
+                        arc['from_id'] = (from_field['row_id'], from_field['col_id'])
+                        arc['to_id'] = (to_field['row_id'], to_field['col_id'])
+                        arcs.append(arc)
 
-                    row_arcs[f"{i}, {j}"] = tuple(label, )
+            return arcs
 
+        def get_block_fields(fields, block_row_id, block_col_id):
+            fields_list = []
 
-            return row_labels
+            for row in fields:
+                for field in row:
+                    if field.get('block_row_id') == block_row_id \
+                      and field.get('block_col_id') == block_col_id:
+                        fields_list.append(field)
 
-        def get_column_arcs(field_labels, col_id):
-            col_labels = field_labels[:, col_id]
-            return col_labels
-
-        def get_block_arcs(field_labels, block_row_id, block_col_id, n):
-            print(block_row_id * n, (block_row_id + 1) * n)
-            block_labels = field_labels[block_row_id * n: (block_row_id + 1) * n,
-                           block_col_id * n: (block_col_id + 1) * n]
-            return block_labels
-
-
+            return fields_list
 
         arcs = np.zeros_like(self.field_array)
 
         for row_id in range(self.n):
             for col_id in range(self.n):
-                block_row_id, block_col_id = get_block_ids(row_id, col_id, self.n)
+                row_fields = self.fields[row_id]
+                col_fields = self.fields[:, col_id]
+                block_fields = get_block_fields(self.fields, block_row_id, block_col_id)
 
-                row_arcs = get_row_arcs(self.field_labels, row_id)
-                column_arcs = get_column_arcs(self.field_labels, col_id)
-                block_arcs = get_block_arcs(self.field_labels, block_row_id, block_col_id)
+                row_arcs = get_arcs_in_fields_list(row_fields)
+                column_arcs = get_arcs_in_fields_list(col_fields)
+                block_arcs = get_arcs_in_fields_list(block_fields)
 
                 running_arcs = row_arcs + column_arcs + block_arcs
                 arcs[row_id][col_id] = running_arcs
