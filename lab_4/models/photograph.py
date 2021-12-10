@@ -16,4 +16,7 @@ class PhotoGraph:
         self.images_pixels_costs = None
         self.transitions_costs = None
 
+    def get_pixels_costs(self):
+        return self.alpha * (1 - self.masks)
+
 
