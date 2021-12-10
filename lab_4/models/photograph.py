@@ -15,6 +15,7 @@ class PhotoGraph:
         self.images = images
         self.masks = masks
         self.alpha = alpha
+        self.beta = beta
         self.images_pixels_costs = None
         self.transitions_costs = None
 
@@ -36,8 +37,10 @@ class PhotoGraph:
         for from_image_id in range(self.num_images):
             for to_image_id in range(self.num_images):
                 transitions_costs[:, :, from_image_id, to_image_id] = \
-                    beta * (np.linalg.norm((images[from_image_id] - images[to_image_id]), ord=1, axis=2) +
+                    self.beta * (np.linalg.norm((images[from_image_id] - images[to_image_id]), ord=1, axis=2) +
                             np.linalg.norm((shifted_images[from_image_id] - shifted_images[to_image_id]), ord=1, axis=2))
 
         return transitions_costs
+
+
 
