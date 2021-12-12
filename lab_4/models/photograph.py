@@ -16,9 +16,9 @@ class PhotoGraph:
         self.masks = masks
         self.alpha = alpha
         self.beta = beta
-        self.pixels_costs = self.get_pixels_costs()
-        self.transitions_costs = self.get_transitions_costs()
-        self.total_costs = self.get_total_costs()
+        self.pixels_costs = None
+        self.transitions_costs = None
+        self.total_costs = None
 
     def get_pixels_costs(self):
         return self.alpha * (1 - self.masks)
@@ -75,6 +75,21 @@ class PhotoGraph:
                                              col_total_costs, axis=0)
 
         return mask_idxes
+
+    def merge_images(self):
+        self.pixels_costs = self.get_pixels_costs()
+        self.transitions_costs = self.get_transitions_costs()
+        self.total_costs = self.get_total_costs()
+
+        output_image = np.zeros_like(self.images[0])
+
+        for row_id in range(self.high):
+            for col_id in range(self.width):
+                image_id = self.mask_idxes[row_id, col_id]
+                output_image[row_id, col_id, :] = self.images[image_id, row_id, col_id, :]
+
+        return output_image
+
 
 
 
