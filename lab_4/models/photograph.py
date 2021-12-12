@@ -18,6 +18,7 @@ class PhotoGraph:
         self.beta = beta
         self.pixels_costs = self.get_pixels_costs()
         self.transitions_costs = self.get_transitions_costs()
+        self.total_costs = self.get_total_costs()
 
     def get_pixels_costs(self):
         return self.alpha * (1 - self.masks)
@@ -37,8 +38,8 @@ class PhotoGraph:
         for from_image_id in range(self.num_images):
             for to_image_id in range(self.num_images):
                 transitions_costs[from_image_id, to_image_id, :, :] = \
-                    self.beta * (np.linalg.norm((self.images[from_image_id] - self.images[to_image_id]), ord=1, axis=2) +
-                                 np.linalg.norm((shifted_images[from_image_id] - shifted_images[to_image_id]), ord=1, axis=2))
+                    self.beta * (np.linalg.norm((self.images[from_image_id] - self.images[to_image_id]), ord=2, axis=2) +
+                                 np.linalg.norm((shifted_images[from_image_id] - shifted_images[to_image_id]), ord=2, axis=2))
 
         return transitions_costs
 
@@ -56,5 +57,25 @@ class PhotoGraph:
                                               total_costs[:, :, n + 1], axis=1)
 
         return total_costs
+
+    def get_mask_idxes(self):
+        mask_idxes = np.zeros((self.high, self.width), dtype=int)
+
+        for n in range(self.high):
+            pixels_col_cost = self.pixels_costs[:, :, n]
+            transitions_col_costs = self.transitions_costs[:, :, :, n]
+            col_total_costs = self.total_costs[:, :, n]
+
+            if n == 0:
+                mask_idxes[:, n] = np.argmin(pixels_col_cost + col_total_costs, axis=0)
+
+            else:
+                mask_idxes[:, n] = np.argmin(pixels_col_cost +
+                                             transitions_col_costs[mask_idxes[:, n - 1], :, :][0] +
+                                             col_total_costs, axis=0)
+
+        return mask_idxes
+
+
 
 
