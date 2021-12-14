@@ -40,8 +40,8 @@ class PhotoGraph:
         for from_image_id in range(self.num_images):
             for to_image_id in range(self.num_images):
                 transitions_costs[from_image_id, to_image_id, :, :] = \
-                    self.beta * (np.linalg.norm((self.images[from_image_id] - self.images[to_image_id]), ord=2, axis=2) +
-                                 np.linalg.norm((shifted_images[from_image_id] - shifted_images[to_image_id]), ord=2, axis=2))
+                    self.beta * (np.linalg.norm((self.images[from_image_id] - self.images[to_image_id]), ord=1, axis=2) *
+                                 np.linalg.norm((shifted_images[from_image_id] - shifted_images[to_image_id]), ord=1, axis=2))
 
         return transitions_costs
 
@@ -72,9 +72,9 @@ class PhotoGraph:
                 mask_idxes[:, n] = np.argmin(pixels_col_cost + col_total_costs, axis=0)
 
             else:
-                for row_id, row_k in enumerate(mask_idxes[:, n - 1]):
+                for row_id, row_mask in enumerate(mask_idxes[:, n - 1]):
                     mask_idxes[row_id, n] = np.argmin(pixels_col_cost[:, row_id] +
-                                                      transitions_col_costs[row_k, :, row_id] +
+                                                      transitions_col_costs[row_mask, :, row_id] +
                                                       col_total_costs[:, row_id], axis=0)
 
         return mask_idxes
