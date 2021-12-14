@@ -3,8 +3,8 @@ import numpy as np
 
 class PhotoGraph:
     def __init__(self, images, masks, alpha=1, beta=1):
-        assert type(images) == np.ndarray
-        assert type(masks) == np.ndarray
+        assert isinstance(images, np.ndarray)
+        assert isinstance(masks, np.ndarray)
         assert images[:, :, :, 0].shape == masks.shape
         assert alpha >= 0
         assert beta >= 0
@@ -16,15 +16,16 @@ class PhotoGraph:
         self.masks = masks
         self.alpha = alpha
         self.beta = beta
+
         self.pixels_costs = None
         self.transitions_costs = None
         self.total_costs = None
         self.mask_idxes = None
 
-    def get_pixels_costs(self):
+    def _get_pixels_costs(self):
         return self.alpha * (1 - self.masks)
 
-    def get_transitions_costs(self):
+    def _get_transitions_costs(self):
         def shift_right(images, shift):
             shifted_images = np.zeros_like(images)
             shifted_images[:, :, shift:] = images[:, :, shift:]
@@ -44,7 +45,7 @@ class PhotoGraph:
 
         return transitions_costs
 
-    def get_total_costs(self):
+    def _get_total_costs(self):
         total_costs = np.zeros((self.num_images, self.high, self.width))
 
         for n in range(self.high - 1, 0, -1):
@@ -59,7 +60,7 @@ class PhotoGraph:
 
         return total_costs
 
-    def get_mask_idxes(self):
+    def _get_mask_idxes(self):
         mask_idxes = np.zeros((self.high, self.width), dtype=int)
 
         for n in range(self.high):
@@ -79,10 +80,10 @@ class PhotoGraph:
         return mask_idxes
 
     def merge_images(self):
-        self.pixels_costs = self.get_pixels_costs()
-        self.transitions_costs = self.get_transitions_costs()
-        self.total_costs = self.get_total_costs()
-        self.mask_idxes = self.get_mask_idxes()
+        self.pixels_costs = self._get_pixels_costs()
+        self.transitions_costs = self._get_transitions_costs()
+        self.total_costs = self._get_total_costs()
+        self.mask_idxes = self._get_mask_idxes()
 
         output_image = np.zeros_like(self.images[0])
 
