@@ -19,6 +19,7 @@ class PhotoGraph:
         self.pixels_costs = None
         self.transitions_costs = None
         self.total_costs = None
+        self.mask_idxes = None
 
     def get_pixels_costs(self):
         return self.alpha * (1 - self.masks)
@@ -70,9 +71,10 @@ class PhotoGraph:
                 mask_idxes[:, n] = np.argmin(pixels_col_cost + col_total_costs, axis=0)
 
             else:
-                mask_idxes[:, n] = np.argmin(pixels_col_cost +
-                                             transitions_col_costs[mask_idxes[:, n - 1], :, :][0] +
-                                             col_total_costs, axis=0)
+                for row_id, row_k in enumerate(mask_idxes[:, n - 1]):
+                    mask_idxes[row_id, n] = np.argmin(pixels_col_cost[:, row_id] +
+                                                      transitions_col_costs[row_k, :, row_id] +
+                                                      col_total_costs[:, row_id], axis=0)
 
         return mask_idxes
 
@@ -80,6 +82,7 @@ class PhotoGraph:
         self.pixels_costs = self.get_pixels_costs()
         self.transitions_costs = self.get_transitions_costs()
         self.total_costs = self.get_total_costs()
+        self.mask_idxes = self.get_mask_idxes()
 
         output_image = np.zeros_like(self.images[0])
 
