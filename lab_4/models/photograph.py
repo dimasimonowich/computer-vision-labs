@@ -48,11 +48,11 @@ class PhotoGraph:
     def _get_total_costs(self):
         total_costs = np.zeros((self.num_images, self.high, self.width))
 
-        for n in range(self.high - 1, -1, -1):
+        for n in range(self.width - 1, -1, -1):
             pixels_col_cost = self.pixels_costs[:, :, n]
             transitions_col_costs = self.transitions_costs[:, :, :, n]
 
-            if n == self.high - 1:
+            if n == self.width - 1:
                 total_costs[:, :, n] = np.min(pixels_col_cost + transitions_col_costs, axis=1)
             else:
                 total_costs[:, :, n] = np.min(pixels_col_cost + transitions_col_costs +
@@ -63,7 +63,7 @@ class PhotoGraph:
     def _get_mask_idxes(self):
         mask_idxes = np.zeros((self.high, self.width), dtype=int)
 
-        for n in range(self.high):
+        for n in range(self.width):
             pixels_col_cost = self.pixels_costs[:, :, n]
             transitions_col_costs = self.transitions_costs[:, :, :, n]
             col_total_costs = self.total_costs[:, :, n]
