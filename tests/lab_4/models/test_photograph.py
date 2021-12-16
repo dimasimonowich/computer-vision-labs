@@ -12,3 +12,7 @@ def test_init_true(image, mask, alpha, beta):
     with pytest.raises(AssertionError):
         model = PhotoGraph(image, mask, alpha, beta)
 
+@pytest.mark.parametrize('image, mask, alpha, beta', [( [56, 2, -1, -1])])
+def test_init_false(image, mask, alpha, beta):
+    with pytest.raises(AssertionError):
+        model = PhotoGraph(image, mask, alpha, beta)
