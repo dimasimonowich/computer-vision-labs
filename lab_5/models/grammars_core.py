@@ -4,9 +4,10 @@ from matplotlib import pyplot as plt
 
 
 class Grammars:
-    def __init__(self, train_data, rules):
+    def __init__(self, train_data, rules, objects):
         self.train_data = train_data
         self.rules = rules
+        self.objects = objects
 
     def _classify(self, image, threshold=0.1):
         predicted_class = None
@@ -55,14 +56,14 @@ class Grammars:
     def get_initial_markup(self, image):
         atoms = self._get_atoms(image)
 
-        initial_markup = np.ones(atoms.shape[:2])*(-1)
+        initial_markup = np.empty(atoms.shape[:2], dtype=object)
 
         for row_id, atom_row in enumerate(atoms):
             for col_id, atom in enumerate(atom_row):
                 atom_class, _ = self._classify(atom)
 
                 if atom_class:
-                    initial_markup[row_id][col_id] = atom_class
+                    initial_markup[row_id][col_id] = list(str(atom_class))
                 else:
                     print("ERROR: Image can not be marked up!")
                     return None
