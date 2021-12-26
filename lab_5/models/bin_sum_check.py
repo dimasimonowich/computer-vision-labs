@@ -57,7 +57,7 @@ class BinSumCheck(Grammars):
 
         for shapes in unique_shapes:
             if -1 not in shapes:
-                views = get_image_views(image, shapes)
+                views = get_image_views(markup, shapes)
                 vconcat_rules_with_shapes = []
                 hconcat_rules_with_shapes = []
 
@@ -69,6 +69,6 @@ class BinSumCheck(Grammars):
                     if np.all(hconcat_rule.get("result_shape") == shapes):
                         hconcat_rules_with_shapes.append(hconcat_rule)
 
-                # markup = vconcat(markup, vconcat_rules_with_shapes, views)
-                # markup = hconcat(markup, hconcat_rules_with_shapes, views)
+                markup = vconcat(markup, vconcat_rules_with_shapes, views)
+                markup = hconcat(markup, hconcat_rules_with_shapes, views)
 
