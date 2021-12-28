@@ -1,5 +1,4 @@
 import numpy as np
-from sklearn.metrics import mean_squared_error
 from matplotlib import pyplot as plt
 
 
@@ -9,7 +8,7 @@ class Grammars:
         self.rules = rules
         self.objects = objects
 
-    def _classify(self, image, threshold=0.1):
+    def _classify(self, image):
         predicted_class = None
 
         for data_tuple in self.train_data:
@@ -19,14 +18,13 @@ class Grammars:
             for train_image in train_images:
                 image_diag = np.diagonal(image)
                 train_image_diag = np.diagonal(train_image)
-                mse = mean_squared_error(image_diag, train_image_diag)
 
-                if mse < threshold:
+                if np.all(image_diag == train_image_diag):
                     predicted_class = label
-                    return predicted_class, mse
+                    return predicted_class
 
         print("ERROR: Image can not be classified!")
-        return None, None
+        return predicted_class
 
     def _get_atoms(self, image):
         def split_image(image, chunk_shape):
@@ -60,7 +58,7 @@ class Grammars:
 
         for row_id, atom_row in enumerate(atoms):
             for col_id, atom in enumerate(atom_row):
-                atom_class, _ = self._classify(atom)
+                atom_class = self._classify(atom)
 
                 if atom_class:
                     initial_markup[row_id][col_id] = list(str(atom_class))
