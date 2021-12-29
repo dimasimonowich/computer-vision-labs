@@ -1,4 +1,5 @@
-numpy
+numpy~=1.21.4
 sklearn
-pytest
+pytest~=6.2.5
 opencv-python
+matplotlib~=3.5.1
