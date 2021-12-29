@@ -12,6 +12,21 @@ one_2 = cv.imread("lab_5/data/one_2.png")[:, :, 0]
 two_0 = cv.imread("lab_5/data/two_0.png")[:, :, 0]
 incorrect = cv.imread("lab_5/data/incorrect_0.png")[:, :, 0]
 
+mini_0 = cv.imread("lab_5/data/mini_0.png")[:, :, 0]
+mini_1 = cv.imread("lab_5/data/mini_1.png")[:, :, 0]
+
+
+mini_upper_term = cv.hconcat([mini_0, mini_1])
+mini_lower_term = cv.hconcat([mini_1, mini_1])
+mini_result = cv.hconcat([mini_1, mini_0])
+
+mini_addition = cv.vconcat([mini_upper_term, mini_lower_term, mini_result])/255
+
+mini_ones = np.array([mini_1])/255
+mini_zeros = np.array([mini_0])/255
+
+mini_train_data = [(mini_zeros, "0"), (mini_ones, "1")]
+
 objects = {
     "0": (1, 1),
     "1": (1, 1),
@@ -71,9 +86,36 @@ zeros = np.array([zero_0, zero_1, zero_2])/255
 
 train_data = [(zeros, "0"), (ones, "1")]
 
+# model = Grammars(mini_train_data, rules, objects)
+# print(model.get_initial_markup(mini_addition))
+
 @pytest.mark.parametrize('image', [two_0/255, incorrect/255])
 def test_classify_true(image):
     model = Grammars(train_data, rules, objects)
     to_compare = model._classify(image)
     assert to_compare == None
+
+@pytest.mark.parametrize('addition, res', [(mini_addition, [[[[1., 1.],
+                                        [1., 1.]],
+                                       [[0., 1.],
+                                        [1., 1.]]],
+                                       [[[0., 1.],
+                                         [1., 1.]],
+                                        [[0., 1.],
+                                         [1., 1.]]],
+                                      [[[0., 1.],
+                                        [1., 1.]],
+                                       [[1., 1.],
+                                        [1., 1.]]]])])
+def test_get_atoms_true(addition, res):
+    model = Grammars(mini_train_data, rules, objects)
+    to_compare = model._get_atoms(addition)
+    np.testing.assert_array_almost_equal(to_compare, res, decimal=1)
+
+
+
+
+
+
+
 
