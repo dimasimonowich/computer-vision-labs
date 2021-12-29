@@ -2,10 +2,15 @@ from .grammars_core import Grammars
 from .rules import hconcat, vconcat
 import numpy as np
 from matplotlib import pyplot as plt
-
+from .constants import DEFAULT_FINAL_SYMBOL, DEFAULT_TRANSITION_SYMBOL, \
+                            DEFAULT_EARLY_STOPPING_SYMBOL, DEFAULT_OBJECTS, DEFAULT_RULES
 
 class BinSumCheck(Grammars):
-    def __init__(self, train_data, rules, objects, final_symbol, transition_symbol, early_stopping_symbol=None):
+    def __init__(self, train_data, rules=DEFAULT_RULES, objects=DEFAULT_OBJECTS,
+                                            final_symbol=DEFAULT_FINAL_SYMBOL,
+                                            transition_symbol=DEFAULT_TRANSITION_SYMBOL,
+                                            early_stopping_symbol=DEFAULT_EARLY_STOPPING_SYMBOL):
+
         super().__init__(train_data, rules, objects)
         self.final_symbol = final_symbol
         self.early_stoping_symbol = early_stopping_symbol
