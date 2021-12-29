@@ -31,6 +31,7 @@ mini_rules = [
     ("vconcat", ["00_col", "0"], "fine_col", True),
     ("hconcat", ["fine_col", "fine_col"], "fine_image", False)]
 
+
 @pytest.mark.parametrize('rules, res', [(mini_rules, ([{'terms': ['0', '0'],
    'result': '00_col',
    'replace': False,
@@ -57,14 +58,31 @@ def test_parse_rules_true(rules, res):
     to_compare = model._parse_rules()
     np.equal(to_compare, res, dtype=tuple)
 
-@pytest.mark.parametrize('mini_rm, mini_tr, mini_markup, mini_addition)', [(
-np.array([[-1 -1],
- [-1 -1],
- [-1 -1]]), False,
-[[list(['-1']), list(['0']), list(['1']), list(['-1'])],
- [list(['-1']), list(['1']), list(['1']), list(['-1'])],
- [list(['-1']), list(['1']), list(['0']), list(['-1'])]]
-)])
-def test_predict_true(mini_rm, mini_tr, mini_markup, mini_addition):
+
+@pytest.mark.parametrize('mini_rm, mini_tr, test_markup', [(
+                                                            np.array([[-1, -1],
+                                                                      [-1, -1],
+                                                                      [-1, -1]]),
+                                                                     False,
+                                                            np.array([['-1', '0', '1', '-1'],
+                                                                      ['-1', '1', '1', '-1'],
+                                                                      ['-1', '1', '0', '-1']]))])
+def test_predict_true(mini_rm, mini_tr, test_markup):
+    model = BinSumCheck(mini_train_data, mini_rules, mini_objects,
+                        final_symbol="fine_image",
+                        transition_symbol="needs_transition_col",
+                        early_stopping_symbol="blocked")
+    mini_res_markup, mini_req_trans, mini_markup = model.predict(mini_addition)
+
+    assert mini_markup.shape == test_markup.shape
+
+    for row_id in range(mini_markup.shape[0]):
+        for col_id in range(mini_markup.shape[1]):
+            assert mini_markup[row_id][col_id][0] == test_markup[row_id][col_id]
+
+    assert mini_tr == mini_req_trans
+
+    np.testing.assert_array_almost_equal( mini_res_markup, mini_rm, decimal=1)
+
 
 
