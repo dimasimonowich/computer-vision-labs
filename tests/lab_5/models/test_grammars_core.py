@@ -112,13 +112,18 @@ def test_get_atoms_true(addition, res):
     to_compare = model._get_atoms(addition)
     np.testing.assert_array_almost_equal(to_compare, res, decimal=1)
 
-@pytest.mark.parametrize('addition, res', [(mini_addition, np.squeeze([[list(['0']), list(['1'])],
-       [list(['1']), list(['1'])],
-       [list(['1']), list(['0'])]]))])
+@pytest.mark.parametrize('addition, res', [(mini_addition, np.array([['0', '1'],
+                                                                     ['1', '1'],
+                                                                     ['1', '0']]))])
 def test_get_initial_markup_true(addition, res):
     model = Grammars(mini_train_data, rules, objects)
     to_compare = model.get_initial_markup(addition)
-    np.equal(to_compare, res, dtype=np.object)
+    assert to_compare.shape == res.shape
+
+    for row_id in range(to_compare.shape[0]):
+        for col_id in range(to_compare.shape[1]):
+            assert to_compare[row_id][col_id][0] == res[row_id][col_id]
+    
 
 
 
