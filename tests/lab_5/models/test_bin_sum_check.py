@@ -57,4 +57,14 @@ def test_parse_rules_true(rules, res):
     to_compare = model._parse_rules()
     np.equal(to_compare, res, dtype=tuple)
 
+@pytest.mark.parametrize('mini_rm, mini_tr, mini_markup, mini_addition)', [(
+np.array([[-1 -1],
+ [-1 -1],
+ [-1 -1]]), False,
+[[list(['-1']), list(['0']), list(['1']), list(['-1'])],
+ [list(['-1']), list(['1']), list(['1']), list(['-1'])],
+ [list(['-1']), list(['1']), list(['0']), list(['-1'])]]
+)])
+def test_predict_true(mini_rm, mini_tr, mini_markup, mini_addition):
+
 
