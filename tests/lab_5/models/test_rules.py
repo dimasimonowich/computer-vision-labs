@@ -33,44 +33,50 @@ mini_rules = [
     ("vconcat", ["00_col", "0"], "fine_col", True),
     ("hconcat", ["fine_col", "fine_col"], "fine_image", False)]
 
-# @pytest.mark.parametrize('markup, vconcat_rules_with_shapes, views, res', [([[list(['-1']), list(['1']), list(['1']), list(['1']), list(['1']),
-#   list(['1']), list(['1']), list(['-1'])],
-#  [list(['-1']), list(['0']), list(['1']), list(['0']), list(['1']),
-#   list(['0']), list(['0']), list(['-1'])],
-#  [list(['-1']), list(['0']), list(['0']), list(['1']), list(['0']),
-#   list(['1']), list(['1']), list(['-1'])]], [{'terms': ['0', '0'], 'result': '00_col', 'replace': False, 'terms_shapes': [(1, 1), (1, 1)], 'result_shape': (2, 1)}, {'terms': ['0', '1'], 'result': '01_col', 'replace': False, 'terms_shapes': [(1, 1), (1, 1)], 'result_shape': (2, 1)}, {'terms': ['1', '0'], 'result': '10_col', 'replace': False, 'terms_shapes': [(1, 1), (1, 1)], 'result_shape': (2, 1)}, {'terms': ['1', '1'], 'result': '11_col', 'replace': False, 'terms_shapes': [(1, 1), (1, 1)], 'result_shape': (2, 1)}, {'terms': ['-1', '-1'], 'result': 'empty_col', 'replace': False, 'terms_shapes': [(1, 1), (1, 1)], 'result_shape': (2, 1)}],
-#                                                                        [[[[list(['-1'])],
-#                                                                           [list(['-1'])]],
-#
-#                                                                          [[list(['0'])],
-#                                                                            [list(['1'])]],
-#
-#                                                                          [[list(['1'])],
-#                                                                            [list(['1'])]],
-#
-#                                                                          [[list(['-1'])],
-#                                                                            [list(['-1'])]]],
-#
-#                                                                         [[[list(['-1'])],
-#                                                                           [list(['-1'])]],
-#
-#                                                                            [[list(['1'])],
-#                                                                                [list(['1'])]],
-#
-#                                                                            [[list(['1'])],
-#                                                                                [list(['0'])]],
-#
-#                                                                            [[list(['-1'])],
-#                                                                                [list(['-1'])]]]],
-# np.squeeze(np.array([[list(['-1']), list(['0']), list(['1']), list(['-1'])],
-#  [list(['-1']), list(['1']), list(['1']), list(['-1'])],
-#  [list(['-1']), list(['1']), list(['0']), list(['-1'])]], ))
-#                                                                        )])
-# def test_vconcut_true(markup, vconcat_rules_with_shapes, views, res):
-#     model = BinSumCheck(mini_train_data, mini_rules, mini_objects,
-#                         final_symbol="fine_image",
-#                         transition_symbol="needs_transition_col",
-#                         early_stopping_symbol="blocked")
-#     to_compare = vconcat(markup, vconcat_rules_with_shapes, views)
-#     np.equal(to_compare, res, dtype=np.object)
+test_markup = np.empty((3,8), dtype=object)
+
+for i in range(test_markup.shape[0]):
+    for j in range(test_markup.shape[1]):
+        test_markup[i, j] = list(["-1"])
+
+
+
+@pytest.mark.parametrize('markup, vconcat_rules_with_shapes, views, res', [(test_markup,
+[{'terms': ['0', '0'], 'result': '00_col', 'replace': False, 'terms_shapes': [(1, 1), (1, 1)], 'result_shape': (2, 1)}, {'terms': ['0', '1'], 'result': '01_col', 'replace': False, 'terms_shapes': [(1, 1), (1, 1)], 'result_shape': (2, 1)}, {'terms': ['1', '0'], 'result': '10_col', 'replace': False, 'terms_shapes': [(1, 1), (1, 1)], 'result_shape': (2, 1)}, {'terms': ['1', '1'], 'result': '11_col', 'replace': False, 'terms_shapes': [(1, 1), (1, 1)], 'result_shape': (2, 1)}, {'terms': ['-1', '-1'], 'result': 'empty_col', 'replace': False, 'terms_shapes': [(1, 1), (1, 1)], 'result_shape': (2, 1)}],
+
+                                                                            [[[[list(['-1'])],
+                                                                               [list(['-1'])]],
+                                                                                [[list(['0'])],
+                                                                                [list(['1'])]],
+                                                                               [[list(['1'])],
+                                                                                [list(['1'])]],
+                                                                               [[list(['-1'])],
+                                                                                [list(['-1'])]]],
+                                                                               [[[list(['-1'])],
+                                                                                 [list(['-1'])]],
+                                                                                 [[list(['1'])],
+                                                                                 [list(['1'])]],
+                                                                                 [[list(['1'])],
+                                                                                 [list(['0'])]],
+                                                                                 [[list(['-1'])],
+                                                                                 [list(['-1'])]]]],
+                                                                        np.array([['-1', '-1', '-1', '-1', '-1',
+                                                                                  '-1', '-1', '-1'],
+                                                                                  ['-1', '-1', '-1', '-1', '-1',
+                                                                                  '-1', '-1', '-1'],
+                                                                                  ['-1', '-1', '-1', '-1', '-1',
+                                                                                  '-1', '-1', '-1']]))])
+def test_vconcut_true(markup, vconcat_rules_with_shapes, views, res):
+    model = BinSumCheck(mini_train_data, mini_rules, mini_objects,
+                        final_symbol="fine_image",
+                        transition_symbol="needs_transition_col",
+                        early_stopping_symbol="blocked")
+    to_compare = vconcat(markup, vconcat_rules_with_shapes, views)
+    assert res.shape == to_compare.shape
+
+    for row_id in range(to_compare.shape[0]):
+        for col_id in range(to_compare.shape[1]):
+            assert to_compare[row_id][col_id][0] == res[row_id][col_id]
+
+
 
