@@ -79,4 +79,35 @@ def test_vconcut_true(markup, vconcat_rules_with_shapes, views, res):
             assert to_compare[row_id][col_id][0] == res[row_id][col_id]
 
 
+test_markup2 = np.empty((3,4), dtype=object)
 
+for i in range(test_markup2.shape[0]):
+    for j in range(test_markup2.shape[1]):
+        test_markup2[i, j] = list(["-1"])
+
+
+@pytest.mark.parametrize('markup, hconcat_rules_with_shapes, views, res', [(test_markup2,
+[{'terms': ['fine_col', 'fine_col'], 'result': 'fine_image', 'replace': False, 'terms_shapes': [(3, 1), (3, 1)], 'result_shape': (3, 2)}],
+                                                                        [[[[list(['-1']), list(['0'])],
+                                                                                [list(['-1']), list(['1'])],
+                                                                                [list(['-1']), list(['1'])]],
+                                                                                [[list(['0']), list(['1'])],
+                                                                                [list(['1']), list(['1'])],
+                                                                                [list(['1']),list(['0'])]],
+                                                                                [[list(['1']), list(['-1'])],
+                                                                                [list(['1']), list(['-1'])],
+                                                                                [list(['0']), list(['-1'])]]]],
+                                                                            np.array([['-1', '-1', '-1', '-1'],
+                                                                             ['-1', '-1', '-1', '-1'],
+                                                                             ['-1', '-1', '-1', '-1']]))])
+def test_hconcut_true(markup, hconcat_rules_with_shapes, views, res):
+    model = BinSumCheck(mini_train_data, mini_rules, mini_objects,
+                        final_symbol="fine_image",
+                        transition_symbol="needs_transition_col",
+                        early_stopping_symbol="blocked")
+    to_compare = hconcat(markup, hconcat_rules_with_shapes, views)
+    assert res.shape == to_compare.shape
+
+    for row_id in range(to_compare.shape[0]):
+        for col_id in range(to_compare.shape[1]):
+            assert to_compare[row_id][col_id][0] == res[row_id][col_id]
